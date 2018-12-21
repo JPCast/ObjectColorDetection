@@ -1,0 +1,4 @@
+https://docs.opencv.org/3.4/da/d97/tutorial_threshold_inRange.html
+
+https://stackoverflow.com/questions/33937800/how-to-make-a-simple-window-with-one-button-using-opencv-highgui-only
+
