@@ -1,0 +1,3 @@
+﻿  HelloWorld.cpp
+c:\users\cfr\onedrive - universidade de aveiro\documentos\ua\cv\trabalho2\objectcolordetection\guiao04ex01\helloworld\helloworld.cpp(106): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+  HelloWorld.vcxproj -> C:\Users\cfr\OneDrive - Universidade de Aveiro\Documentos\UA\CV\Trabalho2\ObjectColorDetection\Guiao04Ex01\x64\Debug\HelloWorld.exe
