@@ -1,8 +1,2 @@
 ﻿  HelloWorld.cpp
-c:\users\cfr\onedrive - universidade de aveiro\documentos\ua\cv\trabalho2\objectcolordetection\carlos\helloworld\helloworld.cpp(126): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\cfr\onedrive - universidade de aveiro\documentos\ua\cv\trabalho2\objectcolordetection\carlos\helloworld\helloworld.cpp(129): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\cfr\onedrive - universidade de aveiro\documentos\ua\cv\trabalho2\objectcolordetection\carlos\helloworld\helloworld.cpp(132): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\cfr\onedrive - universidade de aveiro\documentos\ua\cv\trabalho2\objectcolordetection\carlos\helloworld\helloworld.cpp(135): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\cfr\onedrive - universidade de aveiro\documentos\ua\cv\trabalho2\objectcolordetection\carlos\helloworld\helloworld.cpp(138): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\cfr\onedrive - universidade de aveiro\documentos\ua\cv\trabalho2\objectcolordetection\carlos\helloworld\helloworld.cpp(141): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
   HelloWorld.vcxproj -> C:\Users\cfr\OneDrive - Universidade de Aveiro\Documentos\UA\CV\Trabalho2\ObjectColorDetection\Carlos\x64\Debug\HelloWorld.exe
