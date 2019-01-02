@@ -11,6 +11,8 @@ using namespace std;
 Mat3b canvas;
 String appName = "ColorDetection";
 
+Mat frame;
+
 Rect redButton;
 Rect orangeButton;
 Rect yellowButton;
@@ -28,18 +30,33 @@ bool blueSelect = false;
 
 int count_selections = 0;
 
+bool clicked = false;
+
+Mat hsv;
 
 const int max_value_H = 360 / 2;
 const int max_value = 255;
 const String window_capture_name = "Video Capture";
 const String window_detection_name = "Object Detection";
+const String control_panel = "Control Panel HSV";
 
 String color = "";
 
 int low_H = 0, low_S = 0, low_V = 0;
 int high_H = max_value_H, high_S = max_value, high_V = max_value;
 Mat contour, mask;
- 
+
+
+Mat DoubleMatFromVec3b(Vec3b in)
+{
+    cv::Mat mat(3,1, CV_64FC1);
+    mat.at <double>(0,0) = in [0];
+    mat.at <double>(1,0) = in [1];
+    mat.at <double>(2,0) = in [2];
+
+    return mat;
+};
+
 void cleanAllButtonsSelections() {
 	rectangle(canvas, redButton, Scalar(0, 0, 255), 2);
 	rectangle(canvas, orangeButton, Scalar(0, 140, 255), 2);
@@ -47,21 +64,14 @@ void cleanAllButtonsSelections() {
 	rectangle(canvas, whiteButton, Scalar(255, 255, 255), 2);
 	rectangle(canvas, greenButton, Scalar(0, 255, 0), 2);
 	rectangle(canvas, blueButton, Scalar(255, 0, 0), 2);
+}
 
-	bool redSelect = false;
-	bool orangeSelect = false;
-	bool yellowSelect = false;
-	bool whiteSelect = false;
-	bool greenSelect = false;
-	bool blueSelect = false;
-	/*low_H = 0; low_S = 0; low_V = 0;
-	high_H = max_value_H; high_S = max_value; high_V = max_value;*/
-	inRange(contour, Scalar(255, 255, 255), Scalar(255, 255, 255), mask);
-	contour.setTo(Scalar(0, 0, 0), mask);
+void cleanUnselectButtonSelection() {
+	rectangle(canvas, unselectButton, Scalar(128, 128, 128), 2);
 }
 
 void detectColor(Mat frame, Mat frame_HSV, Mat frame_threshold, Scalar scalarLow, Scalar scalarHigh, Scalar scalarColorToShow) {
-	
+
 
 	//Deteta a cor com os parametros indicados e põe a branco no frame_HSV, o resto fica preto
 	inRange(frame_HSV, scalarLow, scalarHigh, frame_threshold);
@@ -82,161 +92,206 @@ void detectColor(Mat frame, Mat frame_HSV, Mat frame_threshold, Scalar scalarLow
 	//Adicionar à imagem original(frame) os contornos com transparência
 	addWeighted(frame, 1.0, contour, 0.5, 0.0, frame);
 
+	//imshow(control_panel, frame_threshold);
 	/*if(count_selections==1)
-		imshow(control_panel, frame_threshold);
+	imshow(control_panel, frame_threshold);
 	else
-		destroyWindow(control_panel);*/
+	destroyWindow(control_panel);*/
 }
 
 
 void callBackFunc(int event, int x, int y, int flags, void* userdata)
-{
+{	
+	/*printf("%s\n", clicked ? "true" : "false");
+	if ( event == EVENT_LBUTTONDOWN ) {
+		clicked = true;
+		Vec3b pixel_color = frame.at<Vec3b>(Point(x,y));
+		print(pixel_color);
+		cleanUnselectButtonSelection();
+		redSelect = false;
+		orangeSelect = false;
+		yellowSelect = false;
+		whiteSelect = false;
+		greenSelect = false;
+		blueSelect = false;
+		rectangle(canvas, unselectButton, Scalar(0, 0, 0), 2);
+		hsv = DoubleMatFromVec3b(pixel_color);
+	}*/
+
 	if (event == EVENT_LBUTTONDOWN)
-	{ 	
+	{
 		if (redButton.contains(Point(x, y)))
 		{
-			//cleanAllButtonsSelections();
+			clicked = false;
+			cleanUnselectButtonSelection();
 			rectangle(canvas, redButton, Scalar(0, 0, 0), 2);
 			color = "red";
-			if(redSelect){
+			if (redSelect) {
 				redSelect = false;
-				count_selections-=1;
-				rectangle(canvas, redButton, Scalar(0, 0, 255), 2);	
+				count_selections -= 1;
+				rectangle(canvas, redButton, Scalar(0, 0, 255), 2);
 			}
-			else{
+			else {
 				redSelect = true;
-				count_selections+=1;
+				count_selections += 1;
 			}
-			
+
 		}
 		if (orangeButton.contains(Point(x, y)))
 		{
-			//cleanAllButtonsSelections();
+			clicked = false;
+			cleanUnselectButtonSelection();
 			rectangle(canvas, orangeButton, Scalar(0, 0, 0), 2);
 			color = "orange";
-			if(orangeSelect){
+			if (orangeSelect) {
 				orangeSelect = false;
-				count_selections-=1;
-				rectangle(canvas, orangeButton, Scalar(0, 140, 255), 2);	
+				count_selections -= 1;
+				rectangle(canvas, orangeButton, Scalar(0, 140, 255), 2);
 			}
-			else{
+			else {
 				orangeSelect = true;
-				count_selections+=1;
+				count_selections += 1;
 			}
-			
+
 		}
 		if (yellowButton.contains(Point(x, y)))
 		{
-			//cleanAllButtonsSelections();
+			clicked = false;
+			cleanUnselectButtonSelection();
 			rectangle(canvas, yellowButton, Scalar(0, 0, 0), 2);
 			color = "yellow";
-			if(yellowSelect){
-				yellowSelect = false;	
-				count_selections-=1;
+			if (yellowSelect) {
+				yellowSelect = false;
+				count_selections -= 1;
 				rectangle(canvas, yellowButton, Scalar(0, 255, 255), 2);
 			}
-			else{
+			else {
 				yellowSelect = true;
-				count_selections+=1;
+				count_selections += 1;
 			}
-			
+
 		}
 		if (whiteButton.contains(Point(x, y)))
 		{
-			//cleanAllButtonsSelections();
+			clicked = false;
+			cleanUnselectButtonSelection();
 			rectangle(canvas, whiteButton, Scalar(0, 0, 0), 2);
 			color = "white";
-			if(whiteSelect){
-				whiteSelect = false;	
-				count_selections-=1;
+			if (whiteSelect) {
+				whiteSelect = false;
+				count_selections -= 1;
 				rectangle(canvas, whiteButton, Scalar(255, 255, 255), 2);
 			}
-			else{
+			else {
 				whiteSelect = true;
-				count_selections+=1;
+				count_selections += 1;
 			}
-			
+
 		}
 		if (greenButton.contains(Point(x, y)))
 		{
-			//cleanAllButtonsSelections();
+			clicked = false;
+			cleanUnselectButtonSelection();
 			rectangle(canvas, greenButton, Scalar(0, 0, 0), 2);
 			color = "green";
-			if(greenSelect){
-				greenSelect = false;	
-				count_selections-=1;
+			if (greenSelect) {
+				greenSelect = false;
+				count_selections -= 1;
 				rectangle(canvas, greenButton, Scalar(0, 255, 0), 2);
 			}
-			else{
+			else {
 				greenSelect = true;
-				count_selections+=1;
+				count_selections += 1;
 			}
-			
+
 		}
 		if (blueButton.contains(Point(x, y)))
 		{
-			//cleanAllButtonsSelections();
+			clicked = false;
+			cleanUnselectButtonSelection();
 			rectangle(canvas, blueButton, Scalar(0, 0, 0), 2);
 			low_H = 100, high_H = 140;
 			low_S = 140, high_S = 255;
 			low_V = 160, high_V = 255;
 			color = "blue";
-			if(blueSelect){
-				blueSelect = false;	
-				count_selections-=1;
+			if (blueSelect) {
+				blueSelect = false;
+				count_selections -= 1;
 				rectangle(canvas, blueButton, Scalar(255, 0, 0), 2);
 			}
-			else{
+			else {
 				blueSelect = true;
-				count_selections+=1;
+				count_selections += 1;
 			}
-			
+
 		}
 		if (unselectButton.contains(Point(x, y)))
 		{
+			clicked = false;
 			cleanAllButtonsSelections();
+			//Colocar retangulo preto à volta do botão unselect
+			redSelect = false;
+			orangeSelect = false;
+			yellowSelect = false;
+			whiteSelect = false;
+			greenSelect = false;
+			blueSelect = false;
+			rectangle(canvas, unselectButton, Scalar(0, 0, 0), 2);
+
 		}
 
 	}
 	/*if (event == EVENT_LBUTTONUP)
 	{
-		rectangle(canvas, redButton, Scalar(0, 0, 255), 2);
+	rectangle(canvas, redButton, Scalar(0, 0, 255), 2);
 	}*/
 
 	imshow(appName, canvas);
 	waitKey(1);
 }
 
+// Source: http://answers.opencv.org/question/170527/how-to-get-the-pixel-value-by-clicking-on-image/
+static void onMouse(int event, int x, int y, int flags, void* param) // now it's in param
+{
+    Mat &xyz = *((Mat*)param); //cast and deref the param
+
+    if (event == EVENT_LBUTTONDOWN)
+    {
+        short val = xyz.at< short >(y,x); // opencv is row-major ! 
+        cout << "x= " << x << " y= " << y << "val= "<<val<< endl;
+    }
+}
+
 
 static void on_low_H_thresh_trackbar(int, void *)
 {
-    low_H = min(high_H-1, low_H);
-    setTrackbarPos("Low H", appName, low_H);
+	low_H = min(high_H - 1, low_H);
+	setTrackbarPos("Low H", appName, low_H);
 }
 static void on_high_H_thresh_trackbar(int, void *)
 {
-    high_H = max(high_H, low_H+1);
-    setTrackbarPos("High H", appName, high_H);
+	high_H = max(high_H, low_H + 1);
+	setTrackbarPos("High H", appName, high_H);
 }
 static void on_low_S_thresh_trackbar(int, void *)
 {
-    low_S = min(high_S-1, low_S);
-    setTrackbarPos("Low S", appName, low_S);
+	low_S = min(high_S - 1, low_S);
+	setTrackbarPos("Low S", appName, low_S);
 }
 static void on_high_S_thresh_trackbar(int, void *)
 {
-    high_S = max(high_S, low_S+1);
-    setTrackbarPos("High S", appName, high_S);
+	high_S = max(high_S, low_S + 1);
+	setTrackbarPos("High S", appName, high_S);
 }
 static void on_low_V_thresh_trackbar(int, void *)
 {
-    low_V = min(high_V-1, low_V);
-    setTrackbarPos("Low V", appName, low_V);
+	low_V = min(high_V - 1, low_V);
+	setTrackbarPos("Low V", appName, low_V);
 }
 static void on_high_V_thresh_trackbar(int, void *)
 {
-    high_V = max(high_V, low_V+1);
-    setTrackbarPos("High V", appName, high_V);
+	high_V = max(high_V, low_V + 1);
+	setTrackbarPos("High V", appName, high_V);
 }
 
 int main(int argc, char* argv[])
@@ -245,18 +300,18 @@ int main(int argc, char* argv[])
 	VideoCapture cap(argc > 1 ? atoi(argv[1]) : 0);
 	namedWindow(appName);
 	namedWindow(window_detection_name);
-    // Trackbars to set thresholds for HSV values
-    createTrackbar("Low S", appName, &low_S, max_value, on_low_S_thresh_trackbar);
-    createTrackbar("High S", appName, &high_S, max_value, on_high_S_thresh_trackbar);
-    createTrackbar("Low V", appName, &low_V, max_value, on_low_V_thresh_trackbar);
-    createTrackbar("High V", appName, &high_V, max_value, on_high_V_thresh_trackbar);
+	// Trackbars to set thresholds for HSV values
+	createTrackbar("Low S", appName, &low_S, max_value, on_low_S_thresh_trackbar);
+	createTrackbar("High S", appName, &high_S, max_value, on_high_S_thresh_trackbar);
+	createTrackbar("Low V", appName, &low_V, max_value, on_low_V_thresh_trackbar);
+	createTrackbar("High V", appName, &high_V, max_value, on_high_V_thresh_trackbar);
 
-	Mat first_frame, frame, frame_HSV, frame_threshold;
+	Mat first_frame, frame_HSV, frame_threshold;
 
 	//Primeiro frame
 	cap >> first_frame;
 	flip(first_frame, first_frame, 1);
-	// Your buttons
+
 	int numberOfButtons = 7;
 	// Your buttons
 	redButton = Rect(0 * first_frame.cols / numberOfButtons, 0, first_frame.cols / numberOfButtons, 50);
@@ -291,14 +346,15 @@ int main(int argc, char* argv[])
 	// Draw the unselect button
 	canvas(unselectButton) = Vec3b(128, 128, 128);
 	putText(canvas(unselectButton), "Unselect", Point(unselectButton.width*0.15, unselectButton.height*0.7), FONT_HERSHEY_PLAIN, 1, Scalar(0, 0, 0));
+	//Select the unselect button
+	//rectangle(canvas, unselectButton, Scalar(0, 0, 0), 2);
 
-	
 
 	// Setup callback function
 	namedWindow(appName);
 	setMouseCallback(appName, callBackFunc);
 	Mat mask;
-	int first = true;
+
 	while (true) {
 		cap >> frame;
 		if (frame.empty())
@@ -309,25 +365,25 @@ int main(int argc, char* argv[])
 		// Convert from BGR to HSV colorspace
 		cvtColor(frame, frame_HSV, COLOR_BGR2HSV);
 
-		
+		detectColor(frame, frame_HSV, frame_threshold, Scalar(low_H, low_S, low_V), Scalar(high_H, high_S, high_V), Scalar(0, 0, 0));
+
 		detectColor(frame, frame_HSV, frame_threshold, Scalar(0, 0, 0), Scalar(max_value_H, max_value, max_value), Scalar(0, 0, 0));
-		
-		if(redSelect){
+		if (redSelect) {
 			detectColor(frame, frame_HSV, frame_threshold, Scalar(160, low_S, low_V), Scalar(180, high_S, high_V), Scalar(0, 0, 255));
 		}
-		if(orangeSelect){
+		if (orangeSelect) {
 			detectColor(frame, frame_HSV, frame_threshold, Scalar(0, low_S, low_V), Scalar(20, high_S, high_V), Scalar(0, 140, 255));
 		}
-		if(yellowSelect){
+		if (yellowSelect) {
 			detectColor(frame, frame_HSV, frame_threshold, Scalar(20, low_S, low_V), Scalar(40, high_S, high_V), Scalar(0, 255, 255));
 		}
-		if(whiteSelect){
+		if (whiteSelect) {
 			detectColor(frame, frame_HSV, frame_threshold, Scalar(80, low_S, low_V), Scalar(110, high_S, high_V), Scalar(255, 255, 255));
 		}
-		if(greenSelect){
+		if (greenSelect) {
 			detectColor(frame, frame_HSV, frame_threshold, Scalar(60, low_S, low_V), Scalar(90, high_S, high_V), Scalar(0, 255, 0));
 		}
-		if(blueSelect){
+		if (blueSelect) {
 			detectColor(frame, frame_HSV, frame_threshold, Scalar(100, low_S, low_V), Scalar(140, high_S, high_V), Scalar(255, 0, 0));
 		}
 
