@@ -17,6 +17,7 @@ Rect yellowButton;
 Rect whiteButton;
 Rect greenButton;
 Rect blueButton;
+Rect unselectButton;
 
 bool redSelect = false;
 bool orangeSelect = false;
@@ -32,7 +33,6 @@ const int max_value_H = 360 / 2;
 const int max_value = 255;
 const String window_capture_name = "Video Capture";
 const String window_detection_name = "Object Detection";
-const String control_panel = "Control Panel HSV";
 
 String color = "";
 
@@ -47,6 +47,17 @@ void cleanAllButtonsSelections() {
 	rectangle(canvas, whiteButton, Scalar(255, 255, 255), 2);
 	rectangle(canvas, greenButton, Scalar(0, 255, 0), 2);
 	rectangle(canvas, blueButton, Scalar(255, 0, 0), 2);
+
+	bool redSelect = false;
+	bool orangeSelect = false;
+	bool yellowSelect = false;
+	bool whiteSelect = false;
+	bool greenSelect = false;
+	bool blueSelect = false;
+	/*low_H = 0; low_S = 0; low_V = 0;
+	high_H = max_value_H; high_S = max_value; high_V = max_value;*/
+	inRange(contour, Scalar(255, 255, 255), Scalar(255, 255, 255), mask);
+	contour.setTo(Scalar(0, 0, 0), mask);
 }
 
 void detectColor(Mat frame, Mat frame_HSV, Mat frame_threshold, Scalar scalarLow, Scalar scalarHigh, Scalar scalarColorToShow) {
@@ -71,7 +82,6 @@ void detectColor(Mat frame, Mat frame_HSV, Mat frame_threshold, Scalar scalarLow
 	//Adicionar à imagem original(frame) os contornos com transparência
 	addWeighted(frame, 1.0, contour, 0.5, 0.0, frame);
 
-	imshow(control_panel, frame_threshold);
 	/*if(count_selections==1)
 		imshow(control_panel, frame_threshold);
 	else
@@ -182,6 +192,10 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			}
 			
 		}
+		if (unselectButton.contains(Point(x, y)))
+		{
+			cleanAllButtonsSelections();
+		}
 
 	}
 	/*if (event == EVENT_LBUTTONUP)
@@ -197,32 +211,32 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 static void on_low_H_thresh_trackbar(int, void *)
 {
     low_H = min(high_H-1, low_H);
-    setTrackbarPos("Low H", control_panel, low_H);
+    setTrackbarPos("Low H", appName, low_H);
 }
 static void on_high_H_thresh_trackbar(int, void *)
 {
     high_H = max(high_H, low_H+1);
-    setTrackbarPos("High H", control_panel, high_H);
+    setTrackbarPos("High H", appName, high_H);
 }
 static void on_low_S_thresh_trackbar(int, void *)
 {
     low_S = min(high_S-1, low_S);
-    setTrackbarPos("Low S", control_panel, low_S);
+    setTrackbarPos("Low S", appName, low_S);
 }
 static void on_high_S_thresh_trackbar(int, void *)
 {
     high_S = max(high_S, low_S+1);
-    setTrackbarPos("High S", control_panel, high_S);
+    setTrackbarPos("High S", appName, high_S);
 }
 static void on_low_V_thresh_trackbar(int, void *)
 {
     low_V = min(high_V-1, low_V);
-    setTrackbarPos("Low V", control_panel, low_V);
+    setTrackbarPos("Low V", appName, low_V);
 }
 static void on_high_V_thresh_trackbar(int, void *)
 {
     high_V = max(high_V, low_V+1);
-    setTrackbarPos("High V", control_panel, high_V);
+    setTrackbarPos("High V", appName, high_V);
 }
 
 int main(int argc, char* argv[])
@@ -231,12 +245,11 @@ int main(int argc, char* argv[])
 	VideoCapture cap(argc > 1 ? atoi(argv[1]) : 0);
 	namedWindow(appName);
 	namedWindow(window_detection_name);
-	namedWindow(control_panel);
     // Trackbars to set thresholds for HSV values
-    createTrackbar("Low S", control_panel, &low_S, max_value, on_low_S_thresh_trackbar);
-    createTrackbar("High S", control_panel, &high_S, max_value, on_high_S_thresh_trackbar);
-    createTrackbar("Low V", control_panel, &low_V, max_value, on_low_V_thresh_trackbar);
-    createTrackbar("High V", control_panel, &high_V, max_value, on_high_V_thresh_trackbar);
+    createTrackbar("Low S", appName, &low_S, max_value, on_low_S_thresh_trackbar);
+    createTrackbar("High S", appName, &high_S, max_value, on_high_S_thresh_trackbar);
+    createTrackbar("Low V", appName, &low_V, max_value, on_low_V_thresh_trackbar);
+    createTrackbar("High V", appName, &high_V, max_value, on_high_V_thresh_trackbar);
 
 	Mat first_frame, frame, frame_HSV, frame_threshold;
 
@@ -244,12 +257,15 @@ int main(int argc, char* argv[])
 	cap >> first_frame;
 	flip(first_frame, first_frame, 1);
 	// Your buttons
-	redButton	 = Rect(0* first_frame.cols/6, 0, first_frame.cols/6, 50);
-	orangeButton = Rect(1* first_frame.cols/6, 0, first_frame.cols/6, 50);
-	yellowButton = Rect(2* first_frame.cols/6, 0, first_frame.cols/6, 50);
-	whiteButton  = Rect(3* first_frame.cols/6, 0, first_frame.cols/6, 50);
-	greenButton  = Rect(4* first_frame.cols/6, 0, first_frame.cols/6, 50);
-	blueButton	 = Rect(5* first_frame.cols/6, 0, first_frame.cols/6, 50);
+	int numberOfButtons = 7;
+	// Your buttons
+	redButton = Rect(0 * first_frame.cols / numberOfButtons, 0, first_frame.cols / numberOfButtons, 50);
+	orangeButton = Rect(1 * first_frame.cols / numberOfButtons, 0, first_frame.cols / numberOfButtons, 50);
+	yellowButton = Rect(2 * first_frame.cols / numberOfButtons, 0, first_frame.cols / numberOfButtons, 50);
+	whiteButton = Rect(3 * first_frame.cols / numberOfButtons, 0, first_frame.cols / numberOfButtons, 50);
+	greenButton = Rect(4 * first_frame.cols / numberOfButtons, 0, first_frame.cols / numberOfButtons, 50);
+	blueButton = Rect(5 * first_frame.cols / numberOfButtons, 0, first_frame.cols / numberOfButtons, 50);
+	unselectButton = Rect(6 * first_frame.cols / numberOfButtons, 0, first_frame.cols / numberOfButtons, 50);
 
 	// The canvas
 	canvas = Mat3b(first_frame.rows + redButton.height, first_frame.cols, Vec3b(0, 0, 0));
@@ -272,6 +288,9 @@ int main(int argc, char* argv[])
 	// Draw the blue button
 	canvas(blueButton) = Vec3b(255, 0, 0);
 	putText(canvas(blueButton), "Azul", Point(blueButton.width*0.15, blueButton.height*0.7), FONT_HERSHEY_PLAIN, 1, Scalar(255, 255, 255));
+	// Draw the unselect button
+	canvas(unselectButton) = Vec3b(128, 128, 128);
+	putText(canvas(unselectButton), "Unselect", Point(unselectButton.width*0.15, unselectButton.height*0.7), FONT_HERSHEY_PLAIN, 1, Scalar(0, 0, 0));
 
 	
 
@@ -279,7 +298,7 @@ int main(int argc, char* argv[])
 	namedWindow(appName);
 	setMouseCallback(appName, callBackFunc);
 	Mat mask;
-
+	int first = true;
 	while (true) {
 		cap >> frame;
 		if (frame.empty())
@@ -290,26 +309,26 @@ int main(int argc, char* argv[])
 		// Convert from BGR to HSV colorspace
 		cvtColor(frame, frame_HSV, COLOR_BGR2HSV);
 
-		detectColor(frame, frame_HSV, frame_threshold, Scalar(low_H, low_S, low_V), Scalar(high_H, high_S, high_V), Scalar(0, 0, 0));
 		
 		detectColor(frame, frame_HSV, frame_threshold, Scalar(0, 0, 0), Scalar(max_value_H, max_value, max_value), Scalar(0, 0, 0));
+		
 		if(redSelect){
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(160, 120, 90), Scalar(180, 255, 255), Scalar(0, 0, 255));
+			detectColor(frame, frame_HSV, frame_threshold, Scalar(160, low_S, low_V), Scalar(180, high_S, high_V), Scalar(0, 0, 255));
 		}
 		if(orangeSelect){
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(0, 120, 160), Scalar(20, 255, 255), Scalar(0, 140, 255));
+			detectColor(frame, frame_HSV, frame_threshold, Scalar(0, low_S, low_V), Scalar(20, high_S, high_V), Scalar(0, 140, 255));
 		}
 		if(yellowSelect){
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(20, 40, 170), Scalar(40, 255, 255), Scalar(0, 255, 255));
+			detectColor(frame, frame_HSV, frame_threshold, Scalar(20, low_S, low_V), Scalar(40, high_S, high_V), Scalar(0, 255, 255));
 		}
 		if(whiteSelect){
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(80, 0, 220), Scalar(110, 255, 255), Scalar(255, 255, 255));
+			detectColor(frame, frame_HSV, frame_threshold, Scalar(80, low_S, low_V), Scalar(110, high_S, high_V), Scalar(255, 255, 255));
 		}
 		if(greenSelect){
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(60, 110, 100), Scalar(90, 255, 255), Scalar(0, 255, 0));
+			detectColor(frame, frame_HSV, frame_threshold, Scalar(60, low_S, low_V), Scalar(90, high_S, high_V), Scalar(0, 255, 0));
 		}
 		if(blueSelect){
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(100, 140, 160), Scalar(140, 255, 255), Scalar(255, 0, 0));
+			detectColor(frame, frame_HSV, frame_threshold, Scalar(100, low_S, low_V), Scalar(140, high_S, high_V), Scalar(255, 0, 0));
 		}
 
 		addWeighted(frame, 1.0, contour, 0.5, 0.0, frame);
@@ -320,7 +339,6 @@ int main(int argc, char* argv[])
 		// Show the canvas
 		imshow(appName, canvas);
 		imshow(window_detection_name, contour);
-		//imshow(control_panel, frame_threshold);
 
 		char key = (char)waitKey(30);
 		if (key == 'q' || key == 27)
