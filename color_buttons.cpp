@@ -28,16 +28,11 @@ bool whiteSelect = false;
 bool greenSelect = false;
 bool blueSelect = false;
 
-int count_selections = 0;
-
 bool clicked = false;
 
 const int max_value_H = 360 / 2;
 const int max_value = 255;
-const String window_capture_name = "Video Capture";
 const String window_detection_name = "Object Detection";
-
-String color = "";
 
 int B, R, G = 0;
 int H, S, V = 0;
@@ -79,11 +74,6 @@ void detectColor(Mat frame, Mat frame_HSV, Mat frame_threshold, Scalar scalarLow
 
 	//Adicionar à imagem original(frame) os contornos com transparência
 	addWeighted(frame, 1.0, contour, 0.5, 0.0, frame);
-
-	/*if(count_selections==1)
-	imshow(control_panel, frame_threshold);
-	else
-	destroyWindow(control_panel);*/
 }
 
 
@@ -96,15 +86,12 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			clicked = false;
 			cleanUnselectButtonSelection();
 			rectangle(canvas, redButton, Scalar(0, 0, 0), 2);
-			color = "red";
 			if (redSelect) {
 				redSelect = false;
-				count_selections -= 1;
 				rectangle(canvas, redButton, Scalar(0, 0, 255), 2);
 			}
 			else {
 				redSelect = true;
-				count_selections += 1;
 			}
 
 		}
@@ -114,15 +101,12 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			clicked = false;
 			cleanUnselectButtonSelection();
 			rectangle(canvas, orangeButton, Scalar(0, 0, 0), 2);
-			color = "orange";
 			if (orangeSelect) {
 				orangeSelect = false;
-				count_selections -= 1;
 				rectangle(canvas, orangeButton, Scalar(0, 140, 255), 2);
 			}
 			else {
 				orangeSelect = true;
-				count_selections += 1;
 			}
 
 		}
@@ -131,15 +115,12 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			cleanUnselectButtonSelection();
 			clicked = false;
 			rectangle(canvas, yellowButton, Scalar(0, 0, 0), 2);
-			color = "yellow";
 			if (yellowSelect) {
 				yellowSelect = false;
-				count_selections -= 1;
 				rectangle(canvas, yellowButton, Scalar(0, 255, 255), 2);
 			}
 			else {
 				yellowSelect = true;
-				count_selections += 1;
 			}
 
 		}
@@ -148,15 +129,12 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			cleanUnselectButtonSelection();
 			clicked = false;
 			rectangle(canvas, whiteButton, Scalar(0, 0, 0), 2);
-			color = "white";
 			if (whiteSelect) {
 				whiteSelect = false;
-				count_selections -= 1;
 				rectangle(canvas, whiteButton, Scalar(255, 255, 255), 2);
 			}
 			else {
 				whiteSelect = true;
-				count_selections += 1;
 			}
 
 		}
@@ -165,15 +143,12 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			cleanUnselectButtonSelection();
 			clicked = false;
 			rectangle(canvas, greenButton, Scalar(0, 0, 0), 2);
-			color = "green";
 			if (greenSelect) {
 				greenSelect = false;
-				count_selections -= 1;
 				rectangle(canvas, greenButton, Scalar(0, 255, 0), 2);
 			}
 			else {
 				greenSelect = true;
-				count_selections += 1;
 			}
 
 		}
@@ -185,20 +160,18 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			low_H = 100, high_H = 140;
 			low_S = 140, high_S = 255;
 			low_V = 160, high_V = 255;
-			color = "blue";
 			if (blueSelect) {
 				blueSelect = false;
-				count_selections -= 1;
 				rectangle(canvas, blueButton, Scalar(255, 0, 0), 2);
 			}
 			else {
 				blueSelect = true;
-				count_selections += 1;
 			}
 
 		}
 		else if (unselectButton.contains(Point(x, y)))
 		{
+			clicked = false;
 			cleanAllButtonsSelections();
 			//Colocar retangulo preto à volta do botão unselect
 			redSelect = false;
@@ -239,10 +212,6 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 		}
 
 	}
-	/*if (event == EVENT_LBUTTONUP)
-	{
-	rectangle(canvas, redButton, Scalar(0, 0, 255), 2);
-	}*/
 
 	imshow(appName, canvas);
 	waitKey(1);
