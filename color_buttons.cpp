@@ -207,7 +207,9 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 
 			// Adapted from http://answers.opencv.org/question/30547/need-to-know-the-hsv-value/
 			Mat HSV;
-			Mat RGB = frame(Rect(x, y, 1, 1));
+
+			Mat RGB = canvas(Rect(x, y, 5, 5));
+			RGB = mean(RGB);
 			cvtColor(RGB, HSV, CV_BGR2HSV);
 			Vec3b hsv = HSV.at<Vec3b>(0, 0);
 			H = hsv.val[0];
