@@ -97,7 +97,6 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 		}
 		else if (orangeButton.contains(Point(x, y)))
 		{
-			//printf("Clicked on the orange button");
 			clicked = false;
 			cleanUnselectButtonSelection();
 			rectangle(canvas, orangeButton, Scalar(0, 0, 0), 2);
@@ -279,6 +278,7 @@ int main(int argc, char* argv[])
 
 	//Primeiro frame
 	cap >> first_frame;
+	//Imagem como espelho, mais fácil para testar com a câmara do laptop
 	flip(first_frame, first_frame, 1);
 
 	int numberOfButtons = 7;
@@ -330,6 +330,7 @@ int main(int argc, char* argv[])
 		{
 			break;
 		}
+		//Imagem como espelho, mais fácil para testar com a câmara do laptop
 		flip(frame, frame, 1);
 		// Convert from BGR to HSV colorspace
 		cvtColor(frame, frame_HSV, COLOR_BGR2HSV);
