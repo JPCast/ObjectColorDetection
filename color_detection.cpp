@@ -1,3 +1,4 @@
+//#include "stdafx.h"
 #include <iostream>
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -337,7 +338,7 @@ int main(int argc, char* argv[])
 
 		//Clique num pixel para seguir essa cor
 		if (clicked) {
-			printf("Detecting color: %d, %d, %d\n", H, S, V);
+			//printf("Detecting color: %d, %d, %d\n", H, S, V);
 			if (H + 30 >= 180)
 				top_H = 180;
 			else
@@ -348,7 +349,7 @@ int main(int argc, char* argv[])
 			else
 				bottom_H = H - 30;
 
-			printf("Borders are: %d, %d, %d\n", B, G, R);
+			//printf("Borders are: %d, %d, %d\n", B, G, R);
 
 			
 			detectColor(frame, frame_HSV, frame_threshold, Scalar(bottom_H, low_S, low_V), Scalar(top_H, high_S, high_V), Scalar(B, G, R));
