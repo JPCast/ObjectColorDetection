@@ -9,9 +9,9 @@ using namespace cv;
 using namespace std;
 
 Mat3b canvas;
-String appName = "ColorDetection";
-
 Mat frame;
+
+String appName = "ColorDetection";
 
 Rect redButton;
 Rect orangeButton;
@@ -32,30 +32,18 @@ int count_selections = 0;
 
 bool clicked = false;
 
-Mat hsv;
-
 const int max_value_H = 360 / 2;
 const int max_value = 255;
 const String window_capture_name = "Video Capture";
 const String window_detection_name = "Object Detection";
-const String control_panel = "Control Panel HSV";
 
 String color = "";
 
+int B, R, G = 0;
+int H, S, V = 0;
 int low_H = 0, low_S = 0, low_V = 0;
 int high_H = max_value_H, high_S = max_value, high_V = max_value;
 Mat contour, mask;
-
-
-Mat DoubleMatFromVec3b(Vec3b in)
-{
-    cv::Mat mat(3,1, CV_64FC1);
-    mat.at <double>(0,0) = in [0];
-    mat.at <double>(1,0) = in [1];
-    mat.at <double>(2,0) = in [2];
-
-    return mat;
-};
 
 void cleanAllButtonsSelections() {
 	rectangle(canvas, redButton, Scalar(0, 0, 255), 2);
@@ -92,7 +80,6 @@ void detectColor(Mat frame, Mat frame_HSV, Mat frame_threshold, Scalar scalarLow
 	//Adicionar à imagem original(frame) os contornos com transparência
 	addWeighted(frame, 1.0, contour, 0.5, 0.0, frame);
 
-	//imshow(control_panel, frame_threshold);
 	/*if(count_selections==1)
 	imshow(control_panel, frame_threshold);
 	else
@@ -101,23 +88,7 @@ void detectColor(Mat frame, Mat frame_HSV, Mat frame_threshold, Scalar scalarLow
 
 
 void callBackFunc(int event, int x, int y, int flags, void* userdata)
-{	
-	/*printf("%s\n", clicked ? "true" : "false");
-	if ( event == EVENT_LBUTTONDOWN ) {
-		clicked = true;
-		Vec3b pixel_color = frame.at<Vec3b>(Point(x,y));
-		print(pixel_color);
-		cleanUnselectButtonSelection();
-		redSelect = false;
-		orangeSelect = false;
-		yellowSelect = false;
-		whiteSelect = false;
-		greenSelect = false;
-		blueSelect = false;
-		rectangle(canvas, unselectButton, Scalar(0, 0, 0), 2);
-		hsv = DoubleMatFromVec3b(pixel_color);
-	}*/
-
+{
 	if (event == EVENT_LBUTTONDOWN)
 	{
 		if (redButton.contains(Point(x, y)))
@@ -137,8 +108,9 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			}
 
 		}
-		if (orangeButton.contains(Point(x, y)))
+		else if (orangeButton.contains(Point(x, y)))
 		{
+			//printf("Clicked on the orange button");
 			clicked = false;
 			cleanUnselectButtonSelection();
 			rectangle(canvas, orangeButton, Scalar(0, 0, 0), 2);
@@ -154,10 +126,10 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			}
 
 		}
-		if (yellowButton.contains(Point(x, y)))
+		else if (yellowButton.contains(Point(x, y)))
 		{
-			clicked = false;
 			cleanUnselectButtonSelection();
+			clicked = false;
 			rectangle(canvas, yellowButton, Scalar(0, 0, 0), 2);
 			color = "yellow";
 			if (yellowSelect) {
@@ -171,10 +143,10 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			}
 
 		}
-		if (whiteButton.contains(Point(x, y)))
+		else if (whiteButton.contains(Point(x, y)))
 		{
-			clicked = false;
 			cleanUnselectButtonSelection();
+			clicked = false;
 			rectangle(canvas, whiteButton, Scalar(0, 0, 0), 2);
 			color = "white";
 			if (whiteSelect) {
@@ -188,10 +160,10 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			}
 
 		}
-		if (greenButton.contains(Point(x, y)))
+		else if (greenButton.contains(Point(x, y)))
 		{
-			clicked = false;
 			cleanUnselectButtonSelection();
+			clicked = false;
 			rectangle(canvas, greenButton, Scalar(0, 0, 0), 2);
 			color = "green";
 			if (greenSelect) {
@@ -205,10 +177,10 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			}
 
 		}
-		if (blueButton.contains(Point(x, y)))
+		else if (blueButton.contains(Point(x, y)))
 		{
-			clicked = false;
 			cleanUnselectButtonSelection();
+			clicked = false;
 			rectangle(canvas, blueButton, Scalar(0, 0, 0), 2);
 			low_H = 100, high_H = 140;
 			low_S = 140, high_S = 255;
@@ -225,9 +197,8 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			}
 
 		}
-		if (unselectButton.contains(Point(x, y)))
+		else if (unselectButton.contains(Point(x, y)))
 		{
-			clicked = false;
 			cleanAllButtonsSelections();
 			//Colocar retangulo preto à volta do botão unselect
 			redSelect = false;
@@ -239,6 +210,31 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			rectangle(canvas, unselectButton, Scalar(0, 0, 0), 2);
 
 		}
+		else{
+			clicked = true;
+			cleanUnselectButtonSelection();
+			redSelect = false;
+			orangeSelect = false;
+			yellowSelect = false;
+			whiteSelect = false;
+			greenSelect = false;
+			blueSelect = false;
+			rectangle(canvas, unselectButton, Scalar(0, 0, 0), 2);
+
+			// Source: http://answers.opencv.org/question/30547/need-to-know-the-hsv-value/
+			Vec3b rgb = frame.at<Vec3b>(Point(y,x));
+			B=rgb.val[0];
+	 		G=rgb.val[1];
+	 		R=rgb.val[2];
+	 		Mat HSV;
+		  	Mat RGB=frame(Rect(x,y,1,1));
+	  		cvtColor(RGB, HSV,CV_BGR2HSV);
+	    	Vec3b hsv=HSV.at<Vec3b>(0,0);
+	    	H=hsv.val[0];
+	    	S=hsv.val[1];
+	    	V=hsv.val[2];
+	    	//print(hsv);
+		}
 
 	}
 	/*if (event == EVENT_LBUTTONUP)
@@ -248,18 +244,6 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 
 	imshow(appName, canvas);
 	waitKey(1);
-}
-
-// Source: http://answers.opencv.org/question/170527/how-to-get-the-pixel-value-by-clicking-on-image/
-static void onMouse(int event, int x, int y, int flags, void* param) // now it's in param
-{
-    Mat &xyz = *((Mat*)param); //cast and deref the param
-
-    if (event == EVENT_LBUTTONDOWN)
-    {
-        short val = xyz.at< short >(y,x); // opencv is row-major ! 
-        cout << "x= " << x << " y= " << y << "val= "<<val<< endl;
-    }
 }
 
 
@@ -296,7 +280,7 @@ static void on_high_V_thresh_trackbar(int, void *)
 
 int main(int argc, char* argv[])
 {
-
+	int top_H, bottom_H = 0;
 	VideoCapture cap(argc > 1 ? atoi(argv[1]) : 0);
 	namedWindow(appName);
 	namedWindow(window_detection_name);
@@ -385,6 +369,19 @@ int main(int argc, char* argv[])
 		}
 		if (blueSelect) {
 			detectColor(frame, frame_HSV, frame_threshold, Scalar(100, low_S, low_V), Scalar(140, high_S, high_V), Scalar(255, 0, 0));
+		}
+		if (clicked){
+			printf("Detecting color: %d, %d, %d\n", H, S, V);
+			if(H + 30 >= 360)
+				top_H = 360;
+			else
+				top_H = H + 30;
+			
+			if(H - 30 <= 0)
+				bottom_H = 0;
+			else
+				bottom_H = H - 30;
+			detectColor(frame, frame_HSV, frame_threshold, Scalar(bottom_H, low_S, low_V), Scalar(top_H, high_S, high_V), Scalar(B, G, R));
 		}
 
 		addWeighted(frame, 1.0, contour, 0.5, 0.0, frame);
