@@ -221,11 +221,7 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 			blueSelect = false;
 			rectangle(canvas, unselectButton, Scalar(0, 0, 0), 2);
 
-			// Source: http://answers.opencv.org/question/30547/need-to-know-the-hsv-value/
-			Vec3b rgb = frame.at<Vec3b>(Point(y,x));
-			B=rgb.val[0];
-	 		G=rgb.val[1];
-	 		R=rgb.val[2];
+			// Adapted from http://answers.opencv.org/question/30547/need-to-know-the-hsv-value/
 	 		Mat HSV;
 		  	Mat RGB=frame(Rect(x,y,1,1));
 	  		cvtColor(RGB, HSV,CV_BGR2HSV);
@@ -233,7 +229,13 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 	    	H=hsv.val[0];
 	    	S=hsv.val[1];
 	    	V=hsv.val[2];
-	    	//print(hsv);
+
+	    	Mat rgb_version;
+	    	cvtColor(HSV, rgb_version, CV_HSV2BGR);
+	    	Vec3b bgr = rgb_version.at<Vec3b>(0,0);
+	    	B=bgr.val[0];
+	    	G=bgr.val[1];
+	    	R=bgr.val[2];
 		}
 
 	}
@@ -372,8 +374,8 @@ int main(int argc, char* argv[])
 		}
 		if (clicked){
 			printf("Detecting color: %d, %d, %d\n", H, S, V);
-			if(H + 30 >= 360)
-				top_H = 360;
+			if(H + 30 >= 180)
+				top_H = 180;
 			else
 				top_H = H + 30;
 			
@@ -381,6 +383,8 @@ int main(int argc, char* argv[])
 				bottom_H = 0;
 			else
 				bottom_H = H - 30;
+
+			printf("Borders are: %d, %d, %d\n", B, G, R);
 			detectColor(frame, frame_HSV, frame_threshold, Scalar(bottom_H, low_S, low_V), Scalar(top_H, high_S, high_V), Scalar(B, G, R));
 		}
 
