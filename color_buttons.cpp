@@ -173,42 +173,53 @@ void callBackFunc(int event, int x, int y, int flags, void* userdata)
 		{
 			clicked = false;
 			cleanAllButtonsSelections();
-			//Colocar retangulo preto à volta do botão unselect
+			
 			redSelect = false;
 			orangeSelect = false;
 			yellowSelect = false;
 			whiteSelect = false;
 			greenSelect = false;
 			blueSelect = false;
+
+			//Colocar retangulo preto à volta do botão unselect
 			rectangle(canvas, unselectButton, Scalar(0, 0, 0), 2);
 
 		}
-		else{
+		else {
 			clicked = true;
+			cleanAllButtonsSelections();
 			cleanUnselectButtonSelection();
+
 			redSelect = false;
 			orangeSelect = false;
 			yellowSelect = false;
 			whiteSelect = false;
 			greenSelect = false;
 			blueSelect = false;
+
+			//Colocar retangulo preto à volta do botão unselect
 			rectangle(canvas, unselectButton, Scalar(0, 0, 0), 2);
 
-			// Adapted from http://answers.opencv.org/question/30547/need-to-know-the-hsv-value/
-	 		Mat HSV;
-		  	Mat RGB=frame(Rect(x,y,1,1));
-	  		cvtColor(RGB, HSV,CV_BGR2HSV);
-	    	Vec3b hsv=HSV.at<Vec3b>(0,0);
-	    	H=hsv.val[0];
-	    	S=hsv.val[1];
-	    	V=hsv.val[2];
+			setTrackbarPos("Low S", appName, 0);
+			setTrackbarPos("High S", appName, 255);
+			setTrackbarPos("Low V", appName, 0);
+			setTrackbarPos("High V", appName, 255);
 
-	    	Mat rgb_version;
-	    	cvtColor(HSV, rgb_version, CV_HSV2BGR);
-	    	Vec3b bgr = rgb_version.at<Vec3b>(0,0);
-	    	B=bgr.val[0];
-	    	G=bgr.val[1];
-	    	R=bgr.val[2];
+			// Adapted from http://answers.opencv.org/question/30547/need-to-know-the-hsv-value/
+			Mat HSV;
+			Mat RGB = frame(Rect(x, y, 1, 1));
+			cvtColor(RGB, HSV, CV_BGR2HSV);
+			Vec3b hsv = HSV.at<Vec3b>(0, 0);
+			H = hsv.val[0];
+			S = hsv.val[1];
+			V = hsv.val[2];
+
+			Mat rgb_version;
+			cvtColor(HSV, rgb_version, CV_HSV2BGR);
+			Vec3b bgr = rgb_version.at<Vec3b>(0, 0);
+			B = bgr.val[0];
+			G = bgr.val[1];
+			R = bgr.val[2];
 		}
 
 	}
@@ -255,6 +266,7 @@ int main(int argc, char* argv[])
 	VideoCapture cap(argc > 1 ? atoi(argv[1]) : 0);
 	namedWindow(appName);
 	namedWindow(window_detection_name);
+
 	// Trackbars to set thresholds for HSV values
 	createTrackbar("Low S", appName, &low_S, max_value, on_low_S_thresh_trackbar);
 	createTrackbar("High S", appName, &high_S, max_value, on_high_S_thresh_trackbar);
@@ -320,42 +332,51 @@ int main(int argc, char* argv[])
 		// Convert from BGR to HSV colorspace
 		cvtColor(frame, frame_HSV, COLOR_BGR2HSV);
 
-		detectColor(frame, frame_HSV, frame_threshold, Scalar(low_H, low_S, low_V), Scalar(high_H, high_S, high_V), Scalar(0, 0, 0));
-
-		detectColor(frame, frame_HSV, frame_threshold, Scalar(0, 0, 0), Scalar(max_value_H, max_value, max_value), Scalar(0, 0, 0));
-		if (redSelect) {
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(160, low_S, low_V), Scalar(180, high_S, high_V), Scalar(0, 0, 255));
-		}
-		if (orangeSelect) {
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(0, low_S, low_V), Scalar(20, high_S, high_V), Scalar(0, 140, 255));
-		}
-		if (yellowSelect) {
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(20, low_S, low_V), Scalar(40, high_S, high_V), Scalar(0, 255, 255));
-		}
-		if (whiteSelect) {
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(80, low_S, low_V), Scalar(110, high_S, high_V), Scalar(255, 255, 255));
-		}
-		if (greenSelect) {
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(60, low_S, low_V), Scalar(90, high_S, high_V), Scalar(0, 255, 0));
-		}
-		if (blueSelect) {
-			detectColor(frame, frame_HSV, frame_threshold, Scalar(100, low_S, low_V), Scalar(140, high_S, high_V), Scalar(255, 0, 0));
-		}
-		if (clicked){
+		//Clique num pixel para seguir essa cor
+		if (clicked) {
 			printf("Detecting color: %d, %d, %d\n", H, S, V);
-			if(H + 30 >= 180)
+			if (H + 30 >= 180)
 				top_H = 180;
 			else
 				top_H = H + 30;
-			
-			if(H - 30 <= 0)
+
+			if (H - 30 <= 0)
 				bottom_H = 0;
 			else
 				bottom_H = H - 30;
 
 			printf("Borders are: %d, %d, %d\n", B, G, R);
+
+			
 			detectColor(frame, frame_HSV, frame_threshold, Scalar(bottom_H, low_S, low_V), Scalar(top_H, high_S, high_V), Scalar(B, G, R));
 		}
+		else {
+			//Clique num dos botões de cor predefinidos
+			if (redSelect || orangeSelect || yellowSelect || whiteSelect || greenSelect || blueSelect) {
+				if (redSelect) {
+					detectColor(frame, frame_HSV, frame_threshold, Scalar(160, low_S, low_V), Scalar(180, high_S, high_V), Scalar(0, 0, 255));
+				}
+				if (orangeSelect) {
+					detectColor(frame, frame_HSV, frame_threshold, Scalar(0, low_S, low_V), Scalar(20, high_S, high_V), Scalar(0, 140, 255));
+				}
+				if (yellowSelect) {
+					detectColor(frame, frame_HSV, frame_threshold, Scalar(20, low_S, low_V), Scalar(40, high_S, high_V), Scalar(0, 255, 255));
+				}
+				if (whiteSelect) {
+					detectColor(frame, frame_HSV, frame_threshold, Scalar(80, low_S, low_V), Scalar(110, high_S, high_V), Scalar(255, 255, 255));
+				}
+				if (greenSelect) {
+					detectColor(frame, frame_HSV, frame_threshold, Scalar(60, low_S, low_V), Scalar(90, high_S, high_V), Scalar(0, 255, 0));
+				}
+				if (blueSelect) {
+					detectColor(frame, frame_HSV, frame_threshold, Scalar(100, low_S, low_V), Scalar(140, high_S, high_V), Scalar(255, 0, 0));
+				}
+			}
+			else {
+				detectColor(frame, frame_HSV, frame_threshold, Scalar(low_H, low_S, low_V), Scalar(high_H, high_S, high_V), Scalar(0, 0, 0));
+			}
+		}
+		
 
 		addWeighted(frame, 1.0, contour, 0.5, 0.0, frame);
 
